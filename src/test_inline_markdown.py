@@ -197,40 +197,72 @@ class TestSplitNodeLink(unittest.TestCase):
         )
 
 class TestTextToTextNodes(unittest.TestCase):
-    def test_no_markdown(self):
-        text = "This is text without markdown"
+    
+    def test_empty_text(self):
+        """Tests handling of empty text input."""
+        text = ""
+        expected_nodes = []
         nodes = text_to_textnodes(text)
-        self.assertListEqual([TextNode(text, text_type_text)], nodes)
+        self.assertEqual(nodes, expected_nodes)
 
-    def test_bold(self):
-        text = "This is an **bold text**"
+    def test_single_text_node(self):
+        """Tests processing of plain text."""
+        text = "This is plain text."
+        expected_nodes = [TextNode(text, text_type_text)]
         nodes = text_to_textnodes(text)
-        self.assertListEqual(
-            [
-                TextNode("This is an ", text_type_text),
-                TextNode("bold text", text_type_bold)
-            ],
-            nodes
-        )
+        self.assertEqual(nodes, expected_nodes)
 
-    def test_multiple_inline(self):
+    def test_bold_formatting(self):
+        """Tests conversion of bold text."""
+        text = "This has **bold** formatting."
+        expected_nodes = [
+            TextNode("This has ", text_type_text),
+            TextNode("bold", text_type_bold),
+            TextNode(" formatting.", text_type_text)
+        ]
+        nodes = text_to_textnodes(text)
+        self.assertEqual(nodes, expected_nodes)
+
+    def test_italic_formatting(self):
+        """Tests conversion of italic text."""
+        text = "This has *italic* formatting."
+        expected_nodes = [
+            TextNode("This has ", text_type_text),
+            TextNode("italic", text_type_italic),
+            TextNode(" formatting.", text_type_text)
+        ]
+        nodes = text_to_textnodes(text)
+        self.assertEqual(nodes, expected_nodes)
+
+    def test_code_formatting(self):
+        """Tests conversion of code text."""
+        text = "This has `code` formatting."
+        expected_nodes = [
+            TextNode("This has ", text_type_text),
+            TextNode("code", text_type_code),
+            TextNode(" formatting.", text_type_text)
+        ]
+        nodes = text_to_textnodes(text)
+        self.assertEqual(nodes, expected_nodes)
+
+    def test_combined_formatting(self):
+        """Tests combined bold, italic, and code formatting."""
         text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+        expected_nodes = [
+            TextNode("This is ", text_type_text),
+            TextNode("text", text_type_bold),
+            TextNode(" with an ", text_type_text),
+            TextNode("italic", text_type_italic),
+            TextNode(" word and a ", text_type_text),
+            TextNode("code block", text_type_code),
+            TextNode(" and an ", text_type_text),
+            TextNode("image", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", text_type_text),
+            TextNode("link", text_type_link, "https://boot.dev"),
+        ]
+
         nodes = text_to_textnodes(text)
-        self.assertListEqual(
-            [
-                TextNode("This is ", text_type_text),
-                TextNode("text", text_type_bold),
-                TextNode(" with an ", text_type_text),
-                TextNode("italic", text_type_italic),
-                TextNode(" word and a ", text_type_text),
-                TextNode("code block", text_type_code),
-                TextNode(" and an ", text_type_text),
-                TextNode("image", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-                TextNode(" and a ", text_type_text),
-                TextNode("link", text_type_link, "https://boot.dev"),
-            ],
-            nodes
-        )
+        self.assertEqual(nodes, expected_nodes)
 
 
 if __name__ == "__main__":
