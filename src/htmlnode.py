@@ -15,6 +15,14 @@ class HTMLNode:
             return ""
         return " " + " ".join([f'{key}="{value}"' for key, value in self.props.items()])
     
+    def __eq__(self, other_object: object) -> bool:
+        return (
+            self.tag == other_object.tag and
+            self.value == other_object.value and
+            self.children == other_object.children and
+            self.props == other_object.props
+        )
+    
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.tag}, {self.value}, {self.children}, {self.props})"
     
