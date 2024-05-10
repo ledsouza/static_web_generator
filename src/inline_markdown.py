@@ -113,26 +113,7 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
             new_nodes.append(TextNode(original_text, text_type_text))
     return new_nodes
 
-def text_to_textnodes(text: str) -> list[TextNode]:
-    """
-    Converts a raw text string into a list of TextNodes, parsing common markdown elements.
-
-    Args:
-        text: The input text string.
-
-    Returns:
-        A list of TextNodes representing the parsed text, including bold, italic, code, images, and links.
-    """
-    node = TextNode(text, text_type_text)
-    first_nodes = split_nodes_delimiter([node], "**", text_type_bold)
-    second_nodes = split_nodes_delimiter(first_nodes, "*", text_type_italic)
-    third_nodes = split_nodes_delimiter(second_nodes, "`", text_type_code)
-    fourth_nodes = split_nodes_image(third_nodes)
-    final_nodes = split_nodes_link(fourth_nodes)
-
-    return final_nodes
-
-def extract_markdown_images(text: str) -> list[tuple]:
+def extract_markdown_images(text: str) -> list[tuple[str, str]]:
     """
     Extracts image references (alt text and URL) from markdown text.
 
@@ -143,7 +124,7 @@ def extract_markdown_images(text: str) -> list[tuple]:
     """
     return re.findall(r'!\[(.*?)\]\((.*?)\)', text)
 
-def extract_markdown_links(text: str) -> list[tuple]:
+def extract_markdown_links(text: str) -> list[tuple[str, str]]:
     """
     Extracts link references (link text and URL) from markdown text.
 
