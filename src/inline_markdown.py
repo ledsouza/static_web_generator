@@ -11,7 +11,19 @@ from textnode import (
 )
 
 
-def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: str):
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: str) -> list[TextNode]:
+    """
+    Splits TextNodes based on a delimiter for inline elements, 
+    creating new TextNodes with the specified text_type.
+
+    Args:
+        old_nodes: The list of TextNodes to be split.
+        delimiter: The delimiter string (e.g., "**" for bold).
+        text_type: The text type to be assigned to the newly created TextNodes.
+
+    Returns:
+        A new list of TextNodes after the splitting process.
+    """
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != text_type_text:
@@ -31,7 +43,16 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
         new_nodes.extend(split_nodes)
     return new_nodes
 
-def split_nodes_image(old_nodes):
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+    """
+    Splits TextNodes containing markdown image syntax into separate TextNodes.
+
+    Args:
+        old_nodes: The list of TextNodes to be processed.
+
+    Returns:
+        A new list of TextNodes with image sections split out.
+    """
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != text_type_text:
@@ -60,7 +81,16 @@ def split_nodes_image(old_nodes):
             new_nodes.append(TextNode(original_text, text_type_text))
     return new_nodes
 
-def split_nodes_link(old_nodes):
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
+    """
+    Splits TextNodes containing markdown link syntax into separate TextNodes.
+
+    Args:
+        old_nodes: The list of TextNodes to be processed.
+
+    Returns:
+        A new list of TextNodes with link sections split out.
+    """
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != text_type_text:
@@ -83,7 +113,16 @@ def split_nodes_link(old_nodes):
             new_nodes.append(TextNode(original_text, text_type_text))
     return new_nodes
 
-def text_to_textnodes(text):
+def text_to_textnodes(text: str) -> list[TextNode]:
+    """
+    Converts a raw text string into a list of TextNodes, parsing common markdown elements.
+
+    Args:
+        text: The input text string.
+
+    Returns:
+        A list of TextNodes representing the parsed text, including bold, italic, code, images, and links.
+    """
     node = TextNode(text, text_type_text)
     first_nodes = split_nodes_delimiter([node], "**", text_type_bold)
     second_nodes = split_nodes_delimiter(first_nodes, "*", text_type_italic)
@@ -93,8 +132,24 @@ def text_to_textnodes(text):
 
     return final_nodes
 
-def extract_markdown_images(text):
+def extract_markdown_images(text: str) -> list[tuple]:
+    """
+    Extracts image references (alt text and URL) from markdown text.
+
+    Args:
+        text: The input markdown text.
+    Returns:
+        A list of tuples where each tuple contains the alt text and URL of an image.
+    """
     return re.findall(r'!\[(.*?)\]\((.*?)\)', text)
 
-def extract_markdown_links(text):
+def extract_markdown_links(text: str) -> list[tuple]:
+    """
+    Extracts link references (link text and URL) from markdown text.
+
+    Args:
+        text: The input markdown text.
+    Returns:
+        A list of tuples where each tuple contains the link text and URL of a link.
+    """
     return re.findall(r'\[(.*?)\]\((.*?)\)', text)
