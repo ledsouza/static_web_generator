@@ -1,4 +1,3 @@
-
 import re
 from textnode import (
     TextNode,
@@ -134,3 +133,22 @@ def extract_markdown_links(text: str) -> list[tuple[str, str]]:
         A list of tuples where each tuple contains the link text and URL of a link.
     """
     return re.findall(r'\[(.*?)\]\((.*?)\)', text)
+
+def text_to_textnodes(text: str) -> list[TextNode]:
+    """
+    Converts a raw text string into a list of TextNodes, parsing common markdown elements.
+
+    Args:
+        text: The input text string.
+
+    Returns:
+        A list of TextNodes representing the parsed text, including bold, italic, code, images, and links.
+    """
+    node = TextNode(text, text_type_text)
+    first_nodes = split_nodes_delimiter([node], "**", text_type_bold)
+    second_nodes = split_nodes_delimiter(first_nodes, "*", text_type_italic)
+    third_nodes = split_nodes_delimiter(second_nodes, "`", text_type_code)
+    fourth_nodes = split_nodes_image(third_nodes)
+    final_nodes = split_nodes_link(fourth_nodes)
+
+    return final_nodes

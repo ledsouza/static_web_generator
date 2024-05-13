@@ -1,7 +1,7 @@
 import re
-
+from inline_markdown import text_to_textnodes
 from htmlnode import ParentNode, LeafNode
-from textnode import text_to_textnodes, text_node_to_html_node
+from textnode import text_node_to_html_node
 
 # Block types
 block_type_paragraph = "paragraph"
@@ -18,7 +18,7 @@ def markdown_to_html_node(markdown: str):
     for block in blocks:
         html_node = block_to_html_node(block)
         children.append(html_node)
-    return ParentNode("div", children, None)
+    return ParentNode("div", children)
 
 def markdown_to_blocks(markdown: str) -> list[str]:
     """
@@ -42,7 +42,7 @@ def markdown_to_blocks(markdown: str) -> list[str]:
     
     return blocks
 
-def block_to_html_node(block: str) -> :
+def block_to_html_node(block: str) -> ParentNode:
     """
     Converts a markdown block into an equivalent HTML string representation.
 
@@ -60,17 +60,17 @@ def block_to_html_node(block: str) -> :
     block_type = block_to_block_type(block)
 
     if block_type == block_type_paragraph:
-        return handle_paragraph(block)
+        return paragraph_to_html_node(block)
     elif block_type == block_type_heading:
-        return handle_heading(block)
+        return heading_to_html_node(block)
     elif block_type == block_type_code:
-        return handle_code(block)
+        return code_to_html_node(block)
     elif block_type == block_type_quote:
-        return handle_quote(block)
+        return quote_to_html_node(block)
     elif block_type == block_type_unordered_list:
-        return handle_list(block, "ul")
+        return ulist_to_html_node(block)
     elif block_type == block_type_ordered_list:
-        return handle_list(block, "ol")
+        return olist_to_html_node(block)
     else:
         raise ValueError("Invalid block type")
     

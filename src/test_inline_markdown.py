@@ -3,9 +3,8 @@ from inline_markdown import (
     split_nodes_delimiter,
     split_nodes_image,
     split_nodes_link,
-    text_to_textnodes,
+    text_to_textnodes
 )
-
 from textnode import (
     TextNode,
     text_type_text,

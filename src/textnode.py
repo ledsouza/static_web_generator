@@ -1,9 +1,4 @@
 from htmlnode import LeafNode
-from inline_markdown import (
-    split_nodes_delimiter,
-    split_nodes_image,
-    split_nodes_link
-)
 
 text_type_text = "text"
 text_type_bold = "bold"
@@ -67,22 +62,3 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     elif text_node.text_type == text_type_image:
         return LeafNode("img", "", src=text_node.url, alt=text_node.text)
     raise ValueError("The TextNode has invalid text type")
-
-def text_to_textnodes(text: str) -> list[TextNode]:
-    """
-    Converts a raw text string into a list of TextNodes, parsing common markdown elements.
-
-    Args:
-        text: The input text string.
-
-    Returns:
-        A list of TextNodes representing the parsed text, including bold, italic, code, images, and links.
-    """
-    node = TextNode(text, text_type_text)
-    first_nodes = split_nodes_delimiter([node], "**", text_type_bold)
-    second_nodes = split_nodes_delimiter(first_nodes, "*", text_type_italic)
-    third_nodes = split_nodes_delimiter(second_nodes, "`", text_type_code)
-    fourth_nodes = split_nodes_image(third_nodes)
-    final_nodes = split_nodes_link(fourth_nodes)
-
-    return final_nodes
