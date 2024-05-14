@@ -7,16 +7,25 @@ def main() -> None:
     destination = "public"
     copy_files(path, destination)
 
-def copy_files(path, destination):
-    if not os.path.exists(destination) and not os.path.isfile(path):
-        os.mkdir(destination)
-    if os.path.exists(path) and os.path.isfile(path):
-        shutil.copy(path, destination)
-        print(f"{path} copied into {destination}")
-    elif os.path.exists(path) and not os.path.isfile(path):
-        new_paths = os.listdir(path)
-        for new_path in new_paths:
-            copy_files(os.path.join(path, new_path), os.path.join(destination, new_path))
+def copy_files(src_path, dst_path):
+    """Recursively copies files and directories from src_path to dst_path."""
+    try:
+        if os.path.isfile(src_path):
+            shutil.copy2(src_path, dst_path)  # Copy with metadata
+            print(f"Copied file: {src_path} to {dst_path}")
+        elif os.path.isdir(src_path):
+            os.makedirs(dst_path, exist_ok=True)
+            for item in os.listdir(src_path):
+                src_item = os.path.join(src_path, item)
+                dst_item = os.path.join(dst_path, item)
+                copy_files(src_item, dst_item)  # Recursive call
+        else:
+            raise FileNotFoundError(f"Invalid path: {src_path}")
+
+    except PermissionError as e:
+        print(f"Error: Insufficient permissions - {e}")
+    except (shutil.Error, FileNotFoundError) as e:
+        print(f"Error copying files: {e}")
 
 if __name__ == "__main__":
     main()
