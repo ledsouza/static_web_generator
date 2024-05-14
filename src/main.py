@@ -1,13 +1,43 @@
 import os
 import shutil
+from block_markdown import markdown_to_html_node
 
 
 def main() -> None:
-    path = "static"
-    destination = "public"
-    copy_files(path, destination)
+    generate_page("content/index.md", "template.html", "public/index.html")
 
-def copy_files(src_path, dst_path):
+
+def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+
+    # Read files from_path and template_path
+    with open(from_path, "r") as markdown_file:
+        markdown_content = markdown_file.read()
+    with open(template_path, "r") as template_file:
+        template_content = template_file.read()
+
+    node = markdown_to_html_node(markdown_content)
+    html_content = node.to_html()
+
+    title = extract_title(markdown_content)
+    template_content = template_content.replace("{{ Title }}", title).replace(
+        "{{ Content }}", html_content
+    )
+
+    dir_name = os.path.dirname(dest_path)
+    os.makedirs(dir_name, exist_ok=True)
+    with open(dest_path, "w") as html_file:
+        html_file.write(template_content)
+
+
+def extract_title(markdown: str) -> str:
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line.replace("# ", "")
+
+
+def copy_files(src_path: str, dst_path: str) -> None:
     """Recursively copies files and directories from src_path to dst_path."""
     try:
         if os.path.isfile(src_path):
@@ -26,6 +56,7 @@ def copy_files(src_path, dst_path):
         print(f"Error: Insufficient permissions - {e}")
     except (shutil.Error, FileNotFoundError) as e:
         print(f"Error copying files: {e}")
+
 
 if __name__ == "__main__":
     main()

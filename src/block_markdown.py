@@ -12,7 +12,15 @@ block_type_unordered_list = "unordered_list"
 block_type_ordered_list = "ordered_list"
 
 
-def markdown_to_html_node(markdown: str):
+def markdown_to_html_node(markdown: str) -> ParentNode:
+    """Converts a markdown string to a HTML div node.
+
+    Args:
+        markdown (str): The markdown string to convert.
+
+    Returns:
+        ParentNode: A div ParentNode containing the HTML representation of the markdown.
+    """
     blocks = markdown_to_blocks(markdown)
     children = []
     for block in blocks:
