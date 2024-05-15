@@ -1,10 +1,47 @@
 import os
 import shutil
+from pathlib import Path
 from block_markdown import markdown_to_html_node
 
 
 def main() -> None:
-    generate_page("content/index.md", "template.html", "public/index.html")
+    dir_path_content = Path("content")
+    template_path = Path("template.html")
+    dest_dir_path = Path("public")
+    generate_pages_recursive(dir_path_content, template_path, dest_dir_path)
+
+
+def generate_pages_recursive(dir_path_content: Path, template_path: Path, dest_dir_path: Path) -> None:
+    if dir_path_content.exists() and template_path.exists():
+        if not dir_path_content.is_file():
+            dest_dir_path.mkdir(parents=False, exist_ok=True)
+
+        if dir_path_content.is_file():
+            with dir_path_content.open("r") as markdown_file:
+                markdown_content = markdown_file.read()
+            with template_path.open("r") as template_file:
+                template_content = template_file.read()
+
+            html_node = markdown_to_html_node(markdown_content)
+            html_content = html_node.to_html()
+
+            title = extract_title(markdown_content)
+            template_content = template_content.replace("{{ Title }}", title).replace(
+                "{{ Content }}", html_content
+            )
+            output_file_path = dest_dir_path.with_suffix(".html")
+            print(output_file_path)
+            with Path(output_file_path).open("w") as html_file:
+                html_file.write(template_content)
+
+            print(f"{output_file_path} written")
+
+        for child in dir_path_content.glob("*"):
+            generate_pages_recursive(
+                child,
+                template_path,
+                dest_dir_path.joinpath(child.parts[-1]),
+            )
 
 
 def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
